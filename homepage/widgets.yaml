@@ -1,0 +1,23 @@
+# Widgets d'en-tête : la santé du Pi d'un coup d'oeil
+# Doc : https://gethomepage.dev/widgets/
+
+- resources:
+    label: Raspberry Pi 5
+    cpu: true
+    memory: true
+    cputemp: true
+    uptime: true
+
+- resources:
+    label: RAID (données)
+    disk: /mnt/raid
+
+- datetime:
+    locale: fr
+    format:
+      dateStyle: long
+      timeStyle: short
+
+- search:
+    provider: duckduckgo
+    target: _blank

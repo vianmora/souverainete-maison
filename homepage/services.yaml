@@ -1,0 +1,77 @@
+# Les services, groupés par intention plutôt que par catégorie technique.
+# Remplacer exemple.fr par ton domaine.
+# Doc : https://gethomepage.dev/configs/services/
+
+- Reprendre la main sur mes données:
+    - Nextcloud:
+        href: https://nextcloud.exemple.fr
+        description: Mes fichiers, photos, agendas et documents, sous mon toit
+        icon: nextcloud.png
+    - Collabora:
+        href: https://office.exemple.fr
+        description: Éditer les documents à plusieurs, sans Google Docs
+        icon: collabora-online.png
+    - Umami:
+        href: https://analytics.exemple.fr
+        description: Les stats de mes sites, sans espionner personne
+        icon: umami.png
+
+- Communiquer sans intermédiaire:
+    - Listmonk:
+        href: https://news.exemple.fr
+        description: Mes newsletters partent de chez moi
+        icon: listmonk.png
+    - Mautic:
+        href: https://mautic.exemple.fr
+        description: Campagnes et relances automatisées
+        icon: mautic.png
+    - EspoCRM:
+        href: https://crm.exemple.fr
+        description: Qui j'ai rencontré, de quoi on a parlé, quoi ensuite
+        icon: espocrm.png
+
+- Gérer mon activité:
+    - Invoice Ninja:
+        href: https://factures.exemple.fr
+        description: Devis et factures
+        icon: invoice-ninja.png
+    - Hi.Events:
+        href: https://billetterie.exemple.fr
+        description: La billetterie de mes événements, sans commission
+        icon: hi-events.png
+    - Webstudio:
+        href: https://webstudio.exemple.fr
+        description: Je construis mes sites ici, visuellement
+        icon: webstudio.png
+
+- Automatiser:
+    - n8n:
+        href: https://n8n.exemple.fr
+        description: Le ciment entre tous les services
+        icon: n8n.png
+    - Dagster:
+        href: https://dagster.exemple.fr
+        description: Mes pipelines de données
+        icon: dagster.png
+    - Jupyter:
+        href: https://jupyter.exemple.fr
+        description: Notebooks d'exploration
+        icon: jupyter.png
+
+- Ce qui tourne chez moi:
+    - Coolify:
+        href: https://coolify.exemple.fr
+        description: Le PaaS qui déploie tout le reste
+        icon: coolify.png
+    - Uptime Kuma:
+        href: https://status.exemple.fr
+        description: Il me prévient quand ça tombe
+        icon: uptime-kuma.png
+    - Grafana:
+        href: https://grafana.exemple.fr
+        description: Température, RAM, disques : la santé du Pi
+        icon: grafana.png
+    - Prometheus:
+        href: https://prometheus.exemple.fr
+        description: La mémoire des métriques
+        icon: prometheus.png

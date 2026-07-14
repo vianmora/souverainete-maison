@@ -1,0 +1,18 @@
+# Liens externes utiles, groupés par usage
+# Doc : https://gethomepage.dev/configs/bookmarks/
+
+- S'inspirer:
+    - Awesome Selfhosted:
+        - href: https://awesome-selfhosted.net
+          description: Le catalogue des alternatives auto-hébergeables
+    - r/selfhosted:
+        - href: https://www.reddit.com/r/selfhosted/
+          description: La communauté
+
+- Administrer:
+    - Dashboard Cloudflare Zero Trust:
+        - href: https://one.dash.cloudflare.com
+          description: Gestion du tunnel et des accès
+    - Ce repo:
+        - href: https://github.com/CHANGEME/souverainete-maison
+          description: La documentation de cette machine

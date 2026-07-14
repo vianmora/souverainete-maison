@@ -1,0 +1,28 @@
+# Cloudflared : le tunnel qui expose mes services au monde
+# https://developers.cloudflare.com/cloudflare-one/
+# Image arm64 vérifiée sur Raspberry Pi 5.
+#
+# Le principe : ce container ouvre une connexion SORTANTE vers
+# Cloudflare, et c'est par elle que le trafic entrant arrive.
+# Résultat : aucun port ouvert sur la box, pas besoin d'IP fixe,
+# HTTPS géré par Cloudflare. Détails : docs/cloudflare-tunnel.md
+#
+# Le token est UN SECRET : quiconque le possède peut router ton
+# domaine vers ses propres machines. Il ne vit que dans le .env.
+#
+# Démarrage :
+#   docker compose -f cloudflared.yml --env-file ../.env up -d
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    # Pas de ports exposés : c'est tout l'intérêt.
+    # Le container doit juste pouvoir joindre les autres services ;
+    # network_mode host est la façon la plus simple d'y arriver
+    # quand chaque service publie son port sur l'hôte.
+    network_mode: host

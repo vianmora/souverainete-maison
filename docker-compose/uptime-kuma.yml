@@ -1,0 +1,26 @@
+# Uptime Kuma : supervision de disponibilité, alertes quand ça tombe
+# https://github.com/louislam/uptime-kuma
+# Image arm64 vérifiée sur Raspberry Pi 5 (tag 2 = v2.x).
+#
+# C'est le service parfait pour débuter : aucune dépendance,
+# aucune donnée critique, une interface immédiatement gratifiante.
+#
+# Démarrage :
+#   docker compose -f uptime-kuma.yml --env-file ../.env up -d
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - uptime-kuma-data:/app/data
+      # Optionnel : monitorer directement des containers Docker
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  uptime-kuma-data:

@@ -1,0 +1,77 @@
+# EspoCRM : gestion de la relation client (contacts, opportunités, emails)
+# https://www.espocrm.com
+# Images arm64 vérifiées sur Raspberry Pi 5.
+#
+# Trois containers applicatifs sur la même image : le web, le daemon
+# (tâches planifiées, envois d'emails) et le websocket (temps réel).
+# C'est l'architecture officielle recommandée.
+#
+# Démarrage :
+#   docker compose -f espocrm.yml --env-file ../.env up -d
+
+services:
+  espocrm:
+    image: espocrm/espocrm:9
+    container_name: espocrm
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      - ESPOCRM_DATABASE_PLATFORM=Mysql
+      - ESPOCRM_DATABASE_HOST=espocrm-db
+      - ESPOCRM_DATABASE_NAME=espocrm
+      - ESPOCRM_DATABASE_USER=espocrm
+      - ESPOCRM_DATABASE_PASSWORD=${ESPOCRM_DB_PASSWORD}
+      - ESPOCRM_ADMIN_USERNAME=admin
+      - ESPOCRM_ADMIN_PASSWORD=${ESPOCRM_ADMIN_PASSWORD}
+      - ESPOCRM_SITE_URL=${ESPOCRM_SITE_URL}
+    volumes:
+      - espocrm-data:/var/www/html
+    depends_on:
+      espocrm-db:
+        condition: service_healthy
+
+  # Tâches de fond : planificateur, file d'emails...
+  espocrm-daemon:
+    image: espocrm/espocrm:9
+    container_name: espocrm-daemon
+    restart: always
+    entrypoint: docker-daemon.sh
+    volumes:
+      - espocrm-data:/var/www/html
+    depends_on:
+      - espocrm
+
+  # Notifications temps réel dans l'interface
+  espocrm-websocket:
+    image: espocrm/espocrm:9
+    container_name: espocrm-websocket
+    restart: always
+    entrypoint: docker-websocket.sh
+    environment:
+      - ESPOCRM_CONFIG_USE_WEB_SOCKET=true
+    volumes:
+      - espocrm-data:/var/www/html
+    depends_on:
+      - espocrm
+
+  espocrm-db:
+    image: mariadb:11.8
+    container_name: espocrm-db
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=${ESPOCRM_DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=espocrm
+      - MARIADB_USER=espocrm
+      - MARIADB_PASSWORD=${ESPOCRM_DB_PASSWORD}
+    volumes:
+      - espocrm-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  espocrm-data:
+  espocrm-db-data:

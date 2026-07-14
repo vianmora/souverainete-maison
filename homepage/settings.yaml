@@ -1,0 +1,29 @@
+# Réglages généraux de Homepage
+# Doc : https://gethomepage.dev/configs/settings/
+
+title: Souveraineté maison
+description: Ce qui tourne chez moi, chez moi.
+language: fr
+
+theme: dark
+color: slate
+headerStyle: boxed
+
+# L'ordre d'affichage suit l'intention, pas la technique :
+# d'abord ce qui me rend service, ensuite ce qui fait tourner le reste.
+layout:
+  Reprendre la main sur mes données:
+    style: row
+    columns: 3
+  Communiquer sans intermédiaire:
+    style: row
+    columns: 3
+  Gérer mon activité:
+    style: row
+    columns: 3
+  Automatiser:
+    style: row
+    columns: 3
+  Ce qui tourne chez moi:
+    style: row
+    columns: 4

@@ -1,0 +1,55 @@
+# Mautic : marketing automation (segments, campagnes, relances)
+# https://mautic.org
+# Images arm64 vérifiées sur Raspberry Pi 5.
+#
+# Plus lourd qu'un simple outil de newsletter (Listmonk suffit
+# souvent) : je l'utilise pour les scénarios multi-étapes.
+# Les tâches cron de Mautic 5 tournent dans le container web.
+#
+# Démarrage :
+#   docker compose -f mautic.yml --env-file ../.env up -d
+
+services:
+  mautic:
+    image: mautic/mautic:5-apache
+    container_name: mautic
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      - MAUTIC_DB_HOST=mautic-db
+      - MAUTIC_DB_PORT=3306
+      - MAUTIC_DB_DATABASE=mautic
+      - MAUTIC_DB_USER=mautic
+      - MAUTIC_DB_PASSWORD=${MAUTIC_DB_PASSWORD}
+      - MAUTIC_SITE_URL=${MAUTIC_SITE_URL}
+    volumes:
+      - mautic-config:/var/www/html/config
+      - mautic-media:/var/www/html/docroot/media
+      - mautic-logs:/var/www/html/var/logs
+    depends_on:
+      mautic-db:
+        condition: service_healthy
+
+  mautic-db:
+    image: mysql:8.0
+    container_name: mautic-db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MAUTIC_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=mautic
+      - MYSQL_USER=mautic
+      - MYSQL_PASSWORD=${MAUTIC_DB_PASSWORD}
+    volumes:
+      - mautic-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mautic-config:
+  mautic-media:
+  mautic-logs:
+  mautic-db-data:

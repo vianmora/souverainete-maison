@@ -1,0 +1,28 @@
+# Homepage : le tableau de bord de la maison
+# https://gethomepage.dev
+# Image arm64 vérifiée sur Raspberry Pi 5.
+#
+# La config vit dans le dossier ../homepage/ de ce repo :
+# la monter telle quelle suffit pour retrouver mon dashboard.
+#
+# Démarrage :
+#   docker compose -f homepage.yml --env-file ../.env up -d
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    # "always" et non "unless-stopped" : survit à tous les reboots,
+    # y compris après une coupure de courant.
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_ALLOWED_HOSTS}
+      - TZ=${TZ}
+    volumes:
+      # La config versionnée dans ce repo
+      - ../homepage:/app/config
+      # Lecture seule du socket Docker : permet à Homepage d'afficher
+      # l'état des containers. Optionnel, à retirer si ça te gêne.
+      - /var/run/docker.sock:/var/run/docker.sock:ro

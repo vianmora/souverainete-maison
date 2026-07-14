@@ -1,0 +1,43 @@
+# Nextcloud All-in-One : fichiers, photos, agenda, contacts, documents
+# https://github.com/nextcloud/all-in-one
+# Images arm64 vérifiées sur Raspberry Pi 5.
+#
+# AIO fonctionne différemment des autres services : ce compose ne
+# lance QUE le "mastercontainer", qui installe et orchestre lui-même
+# les autres (Nextcloud, PostgreSQL, Redis, Collabora, Imaginary...)
+# via le socket Docker. Chez moi, ça représente 8 containers au final.
+#
+# Après le démarrage, l'interface d'installation AIO est sur
+# https://<ip-du-serveur>:11001 : c'est là qu'on choisit le domaine
+# (ex: nextcloud.exemple.fr) et les composants à activer.
+#
+# Derrière un tunnel Cloudflare, voir docs/cloudflare-tunnel.md :
+# AIO a un mode "reverse proxy" à configurer (APACHE_PORT).
+#
+# Démarrage :
+#   docker compose -f nextcloud-aio.yml --env-file ../.env up -d
+
+services:
+  nextcloud-aio-mastercontainer:
+    image: nextcloud/all-in-one:latest
+    # Ce nom de container est imposé par AIO, ne pas le changer.
+    container_name: nextcloud-aio-mastercontainer
+    restart: always
+    ports:
+      # Interface d'administration AIO
+      - "11001:8080"
+    environment:
+      # Mode reverse proxy : Apache écoute en HTTP simple sur 11000,
+      # c'est le tunnel Cloudflare qui apporte le HTTPS.
+      - APACHE_PORT=11000
+      - APACHE_IP_BINDING=0.0.0.0
+      - SKIP_DOMAIN_VALIDATION=true
+    volumes:
+      # Ce nom de volume est lui aussi imposé par AIO.
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      # AIO pilote Docker pour créer les autres containers.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer

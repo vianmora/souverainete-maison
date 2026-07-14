@@ -1,0 +1,52 @@
+# Listmonk : newsletters et listes de diffusion auto-hébergées
+# https://listmonk.app
+# Images arm64 vérifiées sur Raspberry Pi 5.
+#
+# Remplace Mailchimp. Il faut quand même un serveur SMTP pour
+# l'envoi effectif (un relais type Brevo/Mailjet en offre gratuite,
+# ou son propre Postfix pour les plus courageux) : à configurer
+# dans l'interface, Réglages > SMTP.
+#
+# Démarrage (l'option --install initialise la base au premier lancement) :
+#   docker compose -f listmonk.yml --env-file ../.env run --rm listmonk ./listmonk --install --yes
+#   docker compose -f listmonk.yml --env-file ../.env up -d
+
+services:
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: listmonk
+    restart: always
+    ports:
+      - "9001:9000"
+    environment:
+      - TZ=${TZ}
+      - LISTMONK_app__address=0.0.0.0:9000
+      - LISTMONK_db__host=listmonk-db
+      - LISTMONK_db__port=5432
+      - LISTMONK_db__user=listmonk
+      - LISTMONK_db__password=${LISTMONK_POSTGRES_PASSWORD}
+      - LISTMONK_db__database=listmonk
+      - LISTMONK_ADMIN_USER=${LISTMONK_ADMIN_USER}
+      - LISTMONK_ADMIN_PASSWORD=${LISTMONK_ADMIN_PASSWORD}
+    depends_on:
+      listmonk-db:
+        condition: service_healthy
+
+  listmonk-db:
+    image: postgres:17-alpine
+    container_name: listmonk-db
+    restart: always
+    environment:
+      - POSTGRES_DB=listmonk
+      - POSTGRES_USER=listmonk
+      - POSTGRES_PASSWORD=${LISTMONK_POSTGRES_PASSWORD}
+    volumes:
+      - listmonk-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U listmonk -d listmonk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  listmonk-db-data:

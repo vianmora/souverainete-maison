@@ -1,0 +1,42 @@
+# ============================================================
+# SÉCURITÉ : ce repo est PUBLIC. Rien de sensible ne doit
+# jamais y entrer. Ce .gitignore est la première ligne de
+# défense, pas la seule : relire chaque diff avant de pousser.
+# ============================================================
+
+# Secrets et environnements
+.env
+.env.*
+!.env.example
+*.secret
+*.key
+*.pem
+*.crt
+*.p12
+secrets/
+credentials*
+
+# Tokens et configs sensibles
+*token*
+!*token*.example
+cert.json
+tunnel-credentials*
+
+# Données et volumes locaux
+data/
+volumes/
+backups/
+*.sql
+*.dump
+*.tar.gz
+
+# Bruit d'éditeurs et d'OS
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# Overrides locaux docker compose (souvent pleins de vrais domaines)
+docker-compose.override.yml
+**/docker-compose.override.yml

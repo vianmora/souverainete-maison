@@ -1,0 +1,65 @@
+# Hi.Events : billetterie et gestion d'événements
+# https://hi.events
+# Images arm64 vérifiées sur Raspberry Pi 5.
+#
+# L'image "all-in-one" embarque le frontend et l'API dans un seul
+# container : le plus simple pour un usage personnel ou associatif.
+# (Chez moi je fais tourner un fork personnel ; l'image officielle
+# ci-dessous fait la même chose pour un déploiement standard.)
+#
+# APP_KEY et JWT_SECRET : deux secrets distincts, à générer avec
+#   openssl rand -base64 32
+#
+# Démarrage :
+#   docker compose -f hi-events.yml --env-file ../.env up -d
+
+services:
+  hi-events:
+    image: daveearley/hi.events-all-in-one:latest
+    container_name: hi-events
+    restart: always
+    ports:
+      - "8084:80"
+    environment:
+      - APP_KEY=${HIEVENTS_APP_KEY}
+      - JWT_SECRET=${HIEVENTS_JWT_SECRET}
+      - APP_FRONTEND_URL=${HIEVENTS_APP_URL}
+      - VITE_FRONTEND_URL=${HIEVENTS_APP_URL}
+      - VITE_API_URL_CLIENT=${HIEVENTS_APP_URL}/api
+      - VITE_API_URL_SERVER=http://localhost:80/api
+      - DATABASE_URL=postgresql://hievents:${HIEVENTS_POSTGRES_PASSWORD}@hi-events-db:5432/hievents
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=hi-events-redis
+      - MAIL_MAILER=log
+    depends_on:
+      hi-events-db:
+        condition: service_healthy
+      hi-events-redis:
+        condition: service_started
+
+  hi-events-db:
+    image: postgres:17-alpine
+    container_name: hi-events-db
+    restart: always
+    environment:
+      - POSTGRES_DB=hievents
+      - POSTGRES_USER=hievents
+      - POSTGRES_PASSWORD=${HIEVENTS_POSTGRES_PASSWORD}
+    volumes:
+      - hi-events-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hievents -d hievents"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hi-events-redis:
+    image: redis:7-alpine
+    container_name: hi-events-redis
+    restart: always
+    volumes:
+      - hi-events-redis-data:/data
+
+volumes:
+  hi-events-db-data:
+  hi-events-redis-data:

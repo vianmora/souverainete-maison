@@ -1,0 +1,88 @@
+# Invoice Ninja : devis et factures
+# https://invoiceninja.com
+# Images arm64 vérifiées sur Raspberry Pi 5.
+#
+# L'image officielle v5 est en PHP-FPM : elle ne parle pas HTTP
+# directement, d'où le container nginx qui la sert. Le fichier
+# de config nginx est généré au premier lancement (voir ci-dessous).
+#
+# APP_KEY : à générer une fois avec
+#   docker run --rm invoiceninja/invoiceninja:5 php artisan key:generate --show
+# puis à mettre dans le .env. Elle chiffre les données sensibles en
+# base : la sauvegarder au même titre que la base elle-même.
+#
+# Démarrage :
+#   docker compose -f invoice-ninja.yml --env-file ../.env up -d
+
+services:
+  invoice-ninja:
+    image: invoiceninja/invoiceninja:5
+    container_name: invoice-ninja
+    restart: always
+    environment:
+      - APP_ENV=production
+      - APP_URL=${IN_APP_URL}
+      - APP_KEY=${IN_APP_KEY}
+      - REQUIRE_HTTPS=true
+      - TRUSTED_PROXIES=*
+      - DB_HOST=invoice-ninja-db
+      - DB_DATABASE=ninja
+      - DB_USERNAME=ninja
+      - DB_PASSWORD=${IN_DB_PASSWORD}
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - SESSION_DRIVER=redis
+      - REDIS_HOST=invoice-ninja-redis
+    volumes:
+      - invoice-ninja-public:/var/www/app/public
+      - invoice-ninja-storage:/var/www/app/storage
+    depends_on:
+      invoice-ninja-db:
+        condition: service_healthy
+      invoice-ninja-redis:
+        condition: service_started
+
+  # Sert l'app PHP-FPM en HTTP. La config nginx officielle est ici :
+  # https://github.com/invoiceninja/dockerfiles (in-vhost.conf)
+  # À placer dans ./invoice-ninja/nginx.conf avant le premier lancement.
+  invoice-ninja-web:
+    image: nginx:alpine
+    container_name: invoice-ninja-web
+    restart: always
+    ports:
+      - "8083:80"
+    volumes:
+      - ./invoice-ninja/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - invoice-ninja-public:/var/www/app/public:ro
+    depends_on:
+      - invoice-ninja
+
+  invoice-ninja-db:
+    image: mariadb:11
+    container_name: invoice-ninja-db
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=${IN_DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=ninja
+      - MARIADB_USER=ninja
+      - MARIADB_PASSWORD=${IN_DB_PASSWORD}
+    volumes:
+      - invoice-ninja-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  invoice-ninja-redis:
+    image: redis:7.4-alpine
+    container_name: invoice-ninja-redis
+    restart: always
+    volumes:
+      - invoice-ninja-redis-data:/data
+
+volumes:
+  invoice-ninja-public:
+  invoice-ninja-storage:
+  invoice-ninja-db-data:
+  invoice-ninja-redis-data:
