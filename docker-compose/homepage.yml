@@ -7,6 +7,11 @@
 #
 # Démarrage :
 #   docker compose -f homepage.yml --env-file ../.env up -d
+#
+# Variante Coolify (c'est ainsi qu'il tourne chez moi) : la config
+# vit alors dans un volume nommé au lieu du bind vers ce repo ;
+# copier les fichiers de ../homepage/ dans le volume, Homepage
+# recharge la config à chaud, sans redémarrage.
 
 services:
   homepage:

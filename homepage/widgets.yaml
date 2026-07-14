@@ -8,6 +8,8 @@
     cputemp: true
     uptime: true
 
+# Le chemin disque doit être visible DEPUIS le container : monter
+# /mnt/raid dans le container, sinon utiliser / (vue du container).
 - resources:
     label: RAID (données)
     disk: /mnt/raid

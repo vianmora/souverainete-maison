@@ -6,7 +6,7 @@ Pas un fichier de versions : le récit daté de cette infrastructure, ses avanc�
 
 Naissance de ce repo. L'infra, elle, existait déjà : un Raspberry Pi 5 (16 Go, 2× NVMe 1 To en RAID1) qui fait tourner une quinzaine de services via Coolify, exposés par un tunnel Cloudflare. Ce qui manquait, c'était la partie « visible et reproductible » de la démarche. C'est fait : intention dans le README, un compose par service, la config Homepage, et les notes d'installation, de tunnel et de sauvegarde.
 
-Prochaine étape concrète : déployer Homepage (documenté ici avant même d'être en production chez moi, pour une fois que la doc précède le code).
+Et dans la foulée, Homepage est passé en production le jour même : pour une fois, la doc a précédé le code de quelques heures. La config du dossier `homepage/` de ce repo est celle qui tourne, aux domaines près.
 
 ## 2026-07 (début du mois)
 

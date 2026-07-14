@@ -68,7 +68,7 @@ Puis `sudo systemctl restart docker`.
 ## 4. Le premier service
 
 ```bash
-git clone https://github.com/CHANGEME/souverainete-maison.git
+git clone https://github.com/vianmora/souverainete-maison.git
 cd souverainete-maison
 cp .env.example .env
 # Éditer .env : remplacer chaque CHANGEME
