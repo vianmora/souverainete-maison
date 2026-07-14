@@ -69,7 +69,7 @@
         icon: uptime-kuma.png
     - Grafana:
         href: https://grafana.exemple.fr
-        description: Température, RAM, disques : la santé du Pi
+        description: "Température, RAM, disques : la santé du Pi"
         icon: grafana.png
     - Prometheus:
         href: https://prometheus.exemple.fr
